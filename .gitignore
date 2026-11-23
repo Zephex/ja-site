@@ -1,0 +1,19 @@
+# Runtime data: SQLite database, private uploads, backgrounds and media
+storage/
+
+# Secrets and local configuration
+.env
+.env.*
+.deploy.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Logs and OS/editor files
+*.log
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,7 @@
+# Add this block to your existing Caddyfile. Caddy handles HTTPS for the subdomain.
+# Point the DNS A/AAAA records for invites.example.com at this server first.
+
+invites.example.com {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:8080
+}
