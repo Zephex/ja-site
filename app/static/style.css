@@ -93,7 +93,7 @@ h2 { font-size: 1.35rem; margin: 0; }
 .comment-form textarea { max-height: 320px; overflow-y: auto; }
 .comment-list {
   display: flex; flex-direction: column; gap: 12px;
-  max-height: 420px; overflow-y: auto; padding-right: 8px;
+  max-height: 840px; overflow-y: auto; padding-right: 8px;
   scrollbar-width: thin; scrollbar-color: var(--cyan) rgba(10, 16, 32, .6);
 }
 .comment-list::-webkit-scrollbar { width: 8px; }
