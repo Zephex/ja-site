@@ -19,6 +19,8 @@ ROUTES = [
     ("GET", r"^/invite$", public.invite_query),
     ("POST", r"^/invite$", public.invite_query),
     ("GET", r"^/page$", public.page),
+    ("POST", r"^/page/comment$", public.add_comment),
+    ("POST", r"^/page/comment/(\d+)/delete$", public.delete_comment),
     ("GET", r"^/img/(\d+)$", public.image),
     ("POST", r"^/logout$", public.logout),
     ("GET", r"^/admin/setup$", admin.setup),
@@ -42,6 +44,7 @@ ROUTES = [
     ("POST", r"^/admin/account/(\d+)/link$", admin.add_link),
     ("POST", r"^/admin/account/(\d+)/link/(\d+)$", admin.update_link),
     ("POST", r"^/admin/account/(\d+)/delete$", admin.delete_account),
+    ("POST", r"^/admin/account/(\d+)/comment/(\d+)/delete$", admin.delete_comment),
 ]
 
 COMPILED = [(method, re.compile(pattern), handler) for method, pattern, handler in ROUTES]

@@ -3,6 +3,7 @@
 import os
 import re
 import time
+from datetime import datetime, timezone
 
 from . import config, db, http, markdown, render, security
 from .render import e
@@ -117,17 +118,61 @@ def _redeem(req, invite, name):
     return http.redirect("/page")
 
 
-def page(req):
+def _active_account(req):
     account_id = req.session.get("account_id")
     if not account_id:
-        return http.redirect("/")
+        return None
     account = db.one(
         req.conn, "SELECT * FROM accounts WHERE id = ? AND active = 1", (account_id,)
     )
     if not account:
         req.session.pop("account_id", None)
         req.session.pop("visitor_name", None)
+    return account
+
+
+def _comments_section(req, comments):
+    items = ""
+    for comment in comments:
+        when = datetime.fromtimestamp(comment["created_at"], timezone.utc).strftime(
+            "%d %b %Y %H:%M UTC"
+        )
+        items += """<article class="card comment">
+  <div class="comment-head"><strong>%s</strong><span class="muted small">%s</span></div>
+  <p class="comment-body">%s</p>
+  <form method="post" action="/page/comment/%d/delete" class="inline">%s<button class="button tiny danger" type="submit" data-confirm="Delete your comment?">Delete</button></form>
+</article>""" % (
+            e(comment["author_name"] or "You"),
+            e(when),
+            e(comment["body"]).replace("\n", "<br>"),
+            comment["id"],
+            render.csrf_input(req),
+        )
+    if not items:
+        items = '<p class="muted">No comments yet. Be the first to leave one.</p>'
+    return """<section id="comments" class="comments">
+  <p class="eyebrow">comments</p>
+  <h2>A place for your thoughts</h2>
+  <form method="post" action="/page/comment" class="stack comment-form">
+    %s
+    <label class="field">Your comment<textarea name="body" rows="4" maxlength="2000" required placeholder="Write anything you like..."></textarea></label>
+    <button class="button primary" type="submit">Add comment</button>
+  </form>
+  <div class="comment-list">%s</div>
+</section>""" % (render.csrf_input(req), items)
+
+
+def page(req):
+    account = _active_account(req)
+    if not account:
         return http.redirect("/")
+    account_id = account["id"]
+
+    comments = db.all_rows(
+        req.conn,
+        "SELECT * FROM comments WHERE account_id = ? ORDER BY id",
+        (account_id,),
+    )
 
     images = db.all_rows(
         req.conn,
@@ -175,8 +220,50 @@ def page(req):
   <div class="card message">%s</div>
 </section>
 %s
-%s""" % (greeting, message or '<p class="muted">Nothing here yet.</p>', gallery, link_cards)
+%s
+%s""" % (
+        greeting,
+        message or '<p class="muted">Nothing here yet.</p>',
+        gallery,
+        link_cards,
+        _comments_section(req, comments),
+    )
     return http.html(render.layout("Your page", body, req=req))
+
+
+def add_comment(req):
+    account = _active_account(req)
+    if not account:
+        return http.redirect("/")
+    if req.method != "POST" or not security.csrf_ok(req.session, req):
+        return http.redirect("/page")
+    body = req.form.get("body", "").strip()[:2000]
+    if not body:
+        render.flash(req, "error", "Write a comment before submitting.")
+        return http.redirect("/page#comments")
+    author = (req.session.get("visitor_name") or account["name"]).strip()[:120] or "You"
+    req.conn.execute(
+        """INSERT INTO comments (account_id, author_name, body, created_at)
+           VALUES (?, ?, ?, ?)""",
+        (account["id"], author, body, int(time.time())),
+    )
+    req.conn.commit()
+    render.flash(req, "ok", "Your comment was added.")
+    return http.redirect("/page#comments")
+
+
+def delete_comment(req, comment_id):
+    account = _active_account(req)
+    if not account:
+        return http.redirect("/")
+    if req.method == "POST" and security.csrf_ok(req.session, req):
+        req.conn.execute(
+            "DELETE FROM comments WHERE id = ? AND account_id = ?",
+            (comment_id, account["id"]),
+        )
+        req.conn.commit()
+        render.flash(req, "ok", "Comment deleted.")
+    return http.redirect("/page#comments")
 
 
 def theme_css(req):

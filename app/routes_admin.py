@@ -373,6 +373,9 @@ def account(req, account_id):
     links = db.all_rows(
         req.conn, "SELECT * FROM links WHERE account_id = ? ORDER BY position, id", (account_id,)
     )
+    comments = db.all_rows(
+        req.conn, "SELECT * FROM comments WHERE account_id = ? ORDER BY id", (account_id,)
+    )
     now = int(time.time())
 
     invite_rows = ""
@@ -471,6 +474,31 @@ def account(req, account_id):
     if not link_rows:
         link_rows = '<p class="muted">No links yet. Add one below.</p>'
 
+    comment_rows = ""
+    for comment in comments:
+        when = datetime.fromtimestamp(comment["created_at"], timezone.utc).strftime(
+            "%d %b %Y %H:%M UTC"
+        )
+        comment_rows += """<div class="row">
+  <div class="row-main">
+    <strong>%s</strong>
+    <p class="comment-body">%s</p>
+    <span class="muted small">%s</span>
+  </div>
+  <div class="row-actions">
+    <form method="post" action="/admin/account/%d/comment/%d/delete">%s<button class="button tiny danger" type="submit" data-confirm="Delete this comment?">Delete</button></form>
+  </div>
+</div>""" % (
+            e(comment["author_name"] or acc["name"]),
+            e(comment["body"]).replace("\n", "<br>"),
+            e(when),
+            account_id,
+            comment["id"],
+            csrf_input(req),
+        )
+    if not comment_rows:
+        comment_rows = '<p class="muted">No comments yet.</p>'
+
     body = """
 <section>
   <p class="eyebrow"><a class="accent rainbow-text" href="/admin">← all accounts</a></p>
@@ -548,6 +576,15 @@ def account(req, account_id):
 </section>
 
 <section class="narrow-left">
+  <article class="card">
+    <h2>Comments</h2>
+    <p class="muted small">Written by %s on their own page. Only they and you can see them.</p>
+    <div class="divider"></div>
+    %s
+  </article>
+</section>
+
+<section class="narrow-left">
   <article class="card danger-zone">
     <h2>Danger zone</h2>
     <form method="post" action="/admin/account/%d/delete">
@@ -571,6 +608,8 @@ def account(req, account_id):
         account_id,
         csrf_input(req),
         link_rows,
+        e(acc["name"]),
+        comment_rows,
         account_id,
         csrf_input(req),
     )
@@ -748,6 +787,19 @@ def revoke_invite(req, account_id, invite_id):
         )
         req.conn.commit()
         render.flash(req, "ok", "Invite link revoked.")
+    return http.redirect("/admin/account/%d" % account_id)
+
+
+def delete_comment(req, account_id, comment_id):
+    if _need_admin(req) or not _account(req, account_id):
+        return http.not_found()
+    if req.method == "POST" and security.csrf_ok(req.session, req):
+        req.conn.execute(
+            "DELETE FROM comments WHERE id = ? AND account_id = ?",
+            (comment_id, account_id),
+        )
+        req.conn.commit()
+        render.flash(req, "ok", "Comment deleted.")
     return http.redirect("/admin/account/%d" % account_id)
 
 

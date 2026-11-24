@@ -72,6 +72,14 @@ CREATE TABLE IF NOT EXISTS links (
     position INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS comments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    author_name TEXT NOT NULL DEFAULT '',
+    body TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS media (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     filename TEXT NOT NULL UNIQUE,
@@ -96,6 +104,7 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 CREATE INDEX IF NOT EXISTS idx_invites_account ON invites(account_id);
 CREATE INDEX IF NOT EXISTS idx_images_account ON images(account_id);
 CREATE INDEX IF NOT EXISTS idx_links_account ON links(account_id);
+CREATE INDEX IF NOT EXISTS idx_comments_account ON comments(account_id, id);
 CREATE INDEX IF NOT EXISTS idx_attempts_ip ON login_attempts(ip_hash, created_at);
 """
 

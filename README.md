@@ -22,6 +22,9 @@ running behind Caddy on the same server as your main site.
 - **Site-wide background picker** in `/admin`: solid color, preset gradients, or any
   picture/video from your uploaded media library, applied to every page. Uploads can
   be picked from the dropdown or the thumbnail menu; "Use" applies instantly.
+- **Comments on each person’s page.** Active recipients can leave a comment under
+  their own page, delete their own comments, and only they and you can read them.
+  You can delete any comment from that account in `/admin`.
 - **No visible branding.** A tiny 🐈‍⬛ button in the top-right opens the admin panel.
 - Safe by default: CSRF tokens, hashed passwords, rate-limited admin login, strict
   session cookies, CSP, and HTML-escaped content with a limited Markdown subset.
@@ -126,6 +129,9 @@ user and systemd unit, starts the app, and adds the Caddy block.
    click it once to copy it, and send it privately to that person.
 5. Revoke a link any time — the visitor keeps their current session until it expires,
    but the link can no longer be used to log in again.
+6. When an active recipient opens their page, they can add a comment under the
+   message, pictures and links. Comments are private to that person and to you.
+   They can delete their own; you can delete any from the account’s admin page.
 
 The three invite options can be combined. "All options" means: ask for a name,
 expires at the chosen time, single use. Times are entered in UTC.
