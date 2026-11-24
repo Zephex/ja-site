@@ -155,7 +155,7 @@ def _comments_section(req, comments):
   <h2>A place for your thoughts</h2>
   <form method="post" action="/page/comment" class="stack comment-form">
     %s
-    <label class="field">Your comment<textarea name="body" rows="4" maxlength="2000" required placeholder="Write anything you like..."></textarea></label>
+    <label class="field">Your comment<textarea name="body" rows="4" maxlength="10000" required placeholder="Write anything you like..."></textarea></label>
     <button class="button primary" type="submit">Add comment</button>
   </form>
   <div class="comment-list">%s</div>
@@ -237,7 +237,7 @@ def add_comment(req):
         return http.redirect("/")
     if req.method != "POST" or not security.csrf_ok(req.session, req):
         return http.redirect("/page")
-    body = req.form.get("body", "").strip()[:2000]
+    body = req.form.get("body", "").strip()[:10000]
     if not body:
         render.flash(req, "error", "Write a comment before submitting.")
         return http.redirect("/page#comments")
