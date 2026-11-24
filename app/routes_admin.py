@@ -419,7 +419,7 @@ def account(req, account_id):
     image_rows = ""
     for img in images:
         image_rows += """<div class="row">
-  <img class="thumb" src="/img/%d" alt="">
+  <a class="thumb-link" href="/img/%d" target="_blank" rel="noopener noreferrer"><img class="thumb" src="/img/%d" alt=""></a>
   <form method="post" action="/admin/account/%d/image/%d" class="row-form">
     %s
     <label class="field small-field">Caption<input name="caption" maxlength="200" value="%s"></label>
@@ -431,6 +431,7 @@ def account(req, account_id):
     <button class="button tiny danger" type="submit">Delete</button>
   </form>
 </div>""" % (
+            img["id"],
             img["id"],
             account_id,
             img["id"],

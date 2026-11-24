@@ -156,6 +156,8 @@ h2 { font-size: 1.35rem; margin: 0; }
 .pill.active { color: var(--green); border-color: rgba(109,255,168,.4); }
 .pill.expired, .pill.used-up, .pill.revoked { color: var(--red); border-color: rgba(255,138,155,.4); }
 .thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
+.thumb-link { display: inline-flex; cursor: zoom-in; }
+.thumb-link:hover img { border-color: var(--cyan); }
 .upload-box { display: block; border: 1px dashed var(--cyan); border-radius: 12px; padding: 18px; text-align: center; cursor: pointer; color: var(--cyan); background: rgba(72,211,255,.05); }
 .upload-box input { display: block; margin: 10px auto 0; max-width: 100%; color: var(--muted); font-size: .75rem; }
 
@@ -218,7 +220,9 @@ h2 { font-size: 1.35rem; margin: 0; }
 /* personal page */
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
 .shot { padding: 10px; }
+.shot-link { display: block; cursor: zoom-in; }
 .shot img { width: 100%; height: auto; display: block; border-radius: 10px; }
+.shot-link:hover img { filter: brightness(1.12); }
 .shot figcaption { color: var(--muted); font-size: .8rem; padding: 8px 4px 2px; text-align: center; }
 .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
 .link-card { display: flex; align-items: center; gap: 14px; min-height: 82px; }

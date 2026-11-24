@@ -46,9 +46,9 @@ def layout(title, body, *, req=None, admin=False, minimal=False):
 <meta name="color-scheme" content="dark">
 <meta name="csrf-token" content="%s">
 <title>%s</title>
-<link rel="stylesheet" href="/static/style.css?v=11">
+<link rel="stylesheet" href="/static/style.css?v=12">
 <link rel="stylesheet" href="/theme.css">
-<script src="/static/app.js?v=11" defer></script>
+<script src="/static/app.js?v=12" defer></script>
 </head>
 <body class="%s">
 <div class="backdrop" aria-hidden="true"><div class="aurora a"></div><div class="aurora b"></div><div class="aurora c"></div><div class="grid"></div><div class="vignette"></div></div>

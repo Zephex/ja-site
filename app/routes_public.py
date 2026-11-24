@@ -193,7 +193,11 @@ def page(req):
         figures = ""
         for image in images:
             caption = '<figcaption>%s</figcaption>' % e(image["caption"]) if image["caption"] else ""
-            figures += '<figure class="card shot"><img src="/img/%d" alt="%s" loading="lazy">%s</figure>' % (
+            figures += """<figure class="card shot">
+  <a class="shot-link" href="/img/%d" target="_blank" rel="noopener noreferrer">
+    <img src="/img/%d" alt="%s" loading="lazy">
+  </a>%s</figure>""" % (
+                image["id"],
                 image["id"],
                 e(image["caption"] or "Image"),
                 caption,
